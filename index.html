@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style>
+* {
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none !important;
+}
+</style>  
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="referrer" content="no-referrer">
   <meta name="theme-color" content="#0D0F12">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>长沙 → 海南 · 慢游自驾地图与薄肌生活纪律控制台</title>
+  <title>长沙 → 海南 · 慢游自驾</title>
   <script>
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.addEventListener('pageshow', event => {
@@ -521,7 +527,7 @@
     /* ---- 二级玻璃：卡内嵌块（更轻，避免层层叠加变浊） ---- */
     .console-bar, .wk-card, .param-chip, .risk-note, .redline, .week-card,
     .posture-note, .hosp-item, .edc-item, .eq-drawer, .dt-col, .wk-day,
-    .hud-cap, .tl-item, .photo-fold, .st-head, .deck-card, .deck{
+    .hud-cap, .tl-item, .st-head{
       background:rgba(255,255,255,0.055) !important;
       backdrop-filter:blur(8px) saturate(150%) !important;
       -webkit-backdrop-filter:blur(8px) saturate(150%) !important;
@@ -531,7 +537,7 @@
         inset 0 -1px 1px 0 rgba(0,0,0,0.12),
         0 4px 18px 0 rgba(0,0,0,0.18) !important;
     }
-    .dt-col, .wk-day, .deck-card{ border-radius:16px !important; }
+    .dt-col, .wk-day{ border-radius:16px !important; }
     /* ---- 三级玻璃：悬浮件（导航条 / HUD / 抽屉 / 回顶 / Toast） ---- */
     .glass-nav, .wx-hud, .mh-panel, .toast,
     .side-rail, .to-top-btn, .sr-tip, .nav-edge-indicator{
@@ -554,18 +560,12 @@
       border-radius:0 var(--lg-r) var(--lg-r) 0 !important;
       border-left:0 !important;
     }
-    .sr-tip, .deck-tag{ border-radius:12px !important; }
-    /* ---- 图片遮罩标签保留轻玻璃 ---- */
-    .deck-tag{
-      background:rgba(0,0,0,0.35) !important;
-      backdrop-filter:blur(10px) saturate(140%) !important;
-      -webkit-backdrop-filter:blur(10px) saturate(140%) !important;
-    }
+    .sr-tip{ border-radius:12px !important; }
     /* ---- 文字与图标清晰度保障：纯白冷银 + 极弱暗影 ---- */
     .glass-card, .glass-nav, .station-card, .day-card, .diet-card,
     .console-bar, .wk-card, .param-chip, .risk-note, .redline, .week-card,
     .posture-note, .hosp-item, .edc-item, .eq-drawer, .dt-col, .wk-day,
-    .wx-hud, .mh-panel, .deck-card, .deck{
+    .wx-hud, .mh-panel{
       text-shadow:var(--lg-shadow);
     }
     .glass-card h1, .glass-card h2, .glass-card h3, .glass-card h4,
@@ -586,7 +586,6 @@
       border:none !important;
       box-shadow:none !important;
     }
-    .photo-fold{ overflow:hidden; }
     .custom-scroll{
       background:transparent !important;
       backdrop-filter:none !important;
@@ -595,8 +594,8 @@
     /* 前景内容区统一抬升，保证文字/按钮/打卡框清晰可用 */
     main, header, .container{ position:relative !important; z-index:2 !important; }
     .glass-card{ position:relative; z-index:2; }
-    #panel-tracker .glass-card, .station-card, .deck, .deck-card, .hud-cap, .tl-item, .tab-btn{ position:relative; }
-    .station-card, .deck, .hud-cap, .tl-item, .tab-btn, .toast{ z-index:2; }
+    #panel-tracker .glass-card, .station-card, .hud-cap, .tl-item, .tab-btn{ position:relative; }
+    .station-card, .hud-cap, .tl-item, .tab-btn, .toast{ z-index:2; }
     .toast{ z-index:99; }
     .tab-btn.active{ background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.4); color:#FFFFFF; box-shadow:0 0 18px rgba(255,255,255,.08); }
 
@@ -1384,94 +1383,6 @@
     }
     .diet-tip .dt-tx{ min-width:0; }
 
-    /* 精致折叠图集 */
-    .photo-fold{ border:1px solid var(--line); border-radius:1rem; background:rgba(255,255,255,.02); overflow:hidden; }
-    .photo-fold summary{
-      list-style:none; display:flex; align-items:center; gap:.6rem;
-      padding:.7rem 1rem; cursor:pointer; user-select:none;
-      font-size:.78rem; font-weight:700; color:var(--tx2); transition:color .2s;
-    }
-    .photo-fold summary::-webkit-details-marker{ display:none; }
-    .photo-fold summary:hover{ color:#FFFFFF; }
-    .pf-left{ display:flex; align-items:center; gap:.5rem; color:var(--tx); }
-    .pf-left i{ color:#CBD5E1; }
-    .pf-meta{ margin-left:auto; font-size:.62rem; letter-spacing:.08em; color:var(--tx3); }
-    .pf-arrow{ font-size:.62rem; transition:transform .3s ease; color:var(--tx3); }
-    .photo-fold[open] .pf-arrow{ transform:rotate(180deg); }
-    .pf-body{ padding:0 .4rem 1rem; }
-
-    /* ===== 拍立得照片堆：静止散落 3D 叠放 / 滑动平滑展开 ===== */
-    .deck{
-      display:flex; gap:1.1rem; overflow-x:auto; overflow-y:hidden;
-      touch-action:pan-x;                    /* 允许原生手指横向滑动 */
-      scroll-snap-type:x mandatory; perspective:1100px;
-      padding:1.5rem .8rem 1.7rem; scrollbar-width:none;
-      -webkit-overflow-scrolling:touch;
-      max-width:100%; overscroll-behavior-x:contain;  /* 滑到头不带动整页 */
-    }
-    .deck::-webkit-scrollbar{ display:none; }
-    .deck-card{
-      flex:none; width:min(64%,250px); aspect-ratio:4/3; scroll-snap-align:center;
-      position:relative; overflow:hidden; border-radius:.7rem;
-      border:1px solid rgba(255,255,255,.12); background:#0b0e12;
-      box-shadow:0 16px 38px rgba(0,0,0,.55), 0 3px 10px rgba(0,0,0,.4);
-      transition:transform .5s cubic-bezier(.22,1,.36,1), box-shadow .4s ease;
-      will-change:transform; cursor:grab;
-    }
-    .deck-card:nth-child(1){ transform:rotate(-5.5deg) translateY(9px); z-index:3; }
-    .deck-card:nth-child(2){ transform:rotate(2.5deg) translateY(-7px); z-index:2; }
-    .deck-card:nth-child(3){ transform:rotate(6.5deg) translateY(11px); z-index:1; }
-    .deck.expanded .deck-card{ transform:none; }
-    .deck-card:hover{ box-shadow:0 22px 48px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.22); z-index:5; }
-    .deck-card img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .5s ease; }
-    .deck-card img[hidden]{ display:none; }
-    .deck-card:hover img{ transform:scale(1.05); }
-    .deck-image-fallback{
-      position:absolute; inset:0; display:flex; flex-direction:column;
-      align-items:center; justify-content:center; gap:.45rem; padding:1rem;
-      background:linear-gradient(145deg, rgba(255,255,255,.1), rgba(255,255,255,.025));
-      color:#E2E8F0; text-align:center; font-size:.75rem;
-    }
-    .deck-image-fallback::before{
-      content:'▧'; color:rgba(255,255,255,.58); font-size:1.8rem; line-height:1;
-    }
-    .deck-image-fallback span{ color:#94A3B8; font-size:.65rem; }
-    .deck-tag{
-      display:none !important;
-      position:absolute; left:8px; bottom:8px; padding:2px 8px;
-      font-size:10px; font-weight:700; letter-spacing:.1em; border-radius:5px;
-      background:rgba(0,0,0,0.35) !important; color:#FFFFFF;
-      border:1px solid rgba(255,255,255,0.18) !important;
-      backdrop-filter:blur(10px) saturate(140%) !important;
-      -webkit-backdrop-filter:blur(10px) saturate(140%) !important; z-index:2;
-    }
-    .deck-hint{
-      display:flex; align-items:center; justify-content:center; gap:1.5rem;
-      height:22px; margin-top:.25rem; color:rgba(255,255,255,.52);
-      font-size:1rem; line-height:1; pointer-events:none;
-    }
-    .deck-hint::before,
-    .deck-hint::after{
-      display:block; font-family:Arial,sans-serif; font-size:1.25rem; font-weight:300;
-      line-height:1; animation-duration:1.4s; animation-timing-function:ease-in-out;
-      animation-iteration-count:infinite;
-    }
-    .deck-hint::before{
-      content:'‹'; animation-name:deckSwipeLeft;
-    }
-    .deck-hint::after{
-      content:'›'; animation-name:deckSwipeRight;
-    }
-    @keyframes deckSwipeLeft{
-      0%,100%{ transform:translateX(3px); opacity:.42; }
-      50%{ transform:translateX(-5px); opacity:.9; }
-    }
-    @keyframes deckSwipeRight{
-      0%,100%{ transform:translateX(-3px); opacity:.42; }
-      50%{ transform:translateX(5px); opacity:.9; }
-    }
-    @media(max-width:640px){ .deck-card{ width:78%; } .deck{ gap:.8rem; padding:1.2rem .6rem 1.4rem; } }
-
     /* 复制成功 Toast */
     .toast{
       position:fixed; left:50%; bottom:calc(26px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%) translateY(20px); z-index:99;
@@ -1784,7 +1695,6 @@
       /* 单日闭环卡片 tighter padding，让时间轴圆点与玻璃边框保持 8~12px 呼吸感 */
       #panel-daily > .glass-card{ padding:20px 18px !important; }
       #panel-daily .dc-axis{ padding-left:0 !important; margin-left:0 !important; }
-      .pf-meta{ display:none; }
 
       /* V27：5 列表格 -> 原生折叠日历卡片（彻底告别 390px 下的竖排「糖葫芦」） */
       .wk-table-wrap{ display:none !important; }
@@ -2222,10 +2132,9 @@
     }
 
     /* --- 内部小图标统一降饱和，杜绝荧光感 --- */
-    .tl-ic, .hud-ic, .pf-left i, .deck-tag{ filter:grayscale(1) brightness(1.5); }
+    .tl-ic, .hud-ic{ filter:grayscale(1) brightness(1.5); }
 
     /* --- 交互态：一律银白，不出现任何饱和色 --- */
-    .deck-card:hover{ box-shadow:0 22px 48px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.22); }
     ::selection{ background:rgba(255,255,255,.22); color:#FFFFFF; }
 
     /* ============================================================
@@ -2497,9 +2406,9 @@
     .glass-card, .station-card, .day-card, .diet-card,
     .console-bar, .wk-card, .param-chip, .risk-note, .redline, .week-card,
     .posture-note, .hosp-item, .edc-item, .eq-drawer, .dt-col, .wk-day,
-    .hud-cap, .photo-fold, .st-head, .deck-card, .deck,
+    .hud-cap, .st-head,
     .glass-nav, .wx-hud, .mh-panel, .toast,
-    .side-rail, .to-top-btn, .sr-tip, .nav-edge-indicator, .deck-tag{
+    .side-rail, .to-top-btn, .sr-tip, .nav-edge-indicator{
       background:rgba(255, 255, 255, 0.015) !important;
       backdrop-filter:blur(1.5px) contrast(110%) brightness(102%) !important;
       -webkit-backdrop-filter:blur(1.5px) contrast(110%) brightness(102%) !important;
@@ -2522,7 +2431,6 @@
     #panel-itinerary .station-card .hud-cap,
     #panel-itinerary .station-card .day-card,
     #panel-itinerary .station-card .diet-card,
-    #panel-itinerary .station-card .photo-fold,
     #panel-itinerary .station-card .st-chip,
     #panel-itinerary .station-card .day-tag .mono,
     #panel-itinerary .station-card .diet-prin,
@@ -2653,9 +2561,7 @@
       <symbol id="fa-earth-asia" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.6 3 2.6 15 0 18M12 3c-2.6 3-2.6 15 0 18"></path></symbol>
       <symbol id="fa-gauge-high" viewBox="0 0 24 24"><path d="M4 18a9 9 0 1 1 16 0"></path><path d="M12 14l4-4"></path><circle cx="12" cy="16" r="1.6"></circle></symbol>
       <symbol id="fa-map-location-dot" viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"></path><path d="M9 3v15M15 6v15"></path></symbol>
-      <symbol id="fa-camera" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2.5"></rect><circle cx="12" cy="13.5" r="3.5"></circle><path d="M9 7l1.5-3h3L15 7"></path></symbol>
       <symbol id="fa-diamond-turn-right" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 16v-3.2c0-.9.7-1.6 1.6-1.6h3.4"></path><path d="M12.6 9.4l2 1.8-2 1.8"></path></symbol>
-      <symbol id="fa-images" viewBox="0 0 24 24"><rect x="3" y="5" width="14" height="11" rx="2"></rect><path d="M7 19h11a2 2 0 0 0 2-2V9"></path><path d="M3 13l3.2-3.2 3 3M10.5 12.5l2-2L16 13"></path></symbol>
       <symbol id="fa-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></symbol>
       <symbol id="fa-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.4l2.8 2.8L16.4 9.6"></path></symbol>
     </defs>
@@ -3147,33 +3053,30 @@
       </div>
 
       <!-- 四大核心数据盘 -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="glass-card p-4 rounded-2xl border-l-4 border-white/30">
-          <div class="text-xs text-slate-400">主通行廊道</div>
-          <div class="text-lg font-bold text-white mt-1">G107 → G325 → G207</div>
-          <div class="text-xs text-slate-300 mt-1">避开重卡与山路，均速 55-65 km/h</div>
-        </div>
-        <div class="glass-card p-4 rounded-2xl border-l-4 border-white/22">
-          <div class="text-xs text-slate-400">每日驾驶配额</div>
-          <div class="text-lg font-bold text-white mt-1 mono">2.5 ~ 3.5 小时</div>
-          <div class="text-xs text-slate-300 mt-1">里程 120-160 km，心神零内耗</div>
-        </div>
-        <div class="glass-card p-4 rounded-2xl border-l-4 border-white/30">
-          <div class="text-xs text-slate-400">驻留节拍配置</div>
-          <div class="text-lg font-bold text-white mt-1">每站体验 2 天</div>
-          <div class="text-xs text-slate-300 mt-1">首日开卡练抗阻，次日漫步吹风</div>
-        </div>
-        <div class="glass-card p-4 rounded-2xl border-l-4 border-white/22">
-          <div class="text-xs text-slate-400">补能居所双闭环</div>
-          <div class="text-lg font-bold text-white mt-1">超充 + 24H 铁馆洗浴</div>
-          <div class="text-xs text-slate-300 mt-1">车内露营平躺 + 扫码次卡无推销</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-card p-4 rounded-2xl border-l-4 border-white/30">
+            <div class="text-xs text-slate-400">路线规划</div>
+            <div class="text-lg font-bold text-white mt-1 mono">G107 → G325 → G207</div>
+          </div>
+          <div class="glass-card p-4 rounded-2xl border-l-4 border-white/22">
+            <div class="text-xs text-slate-400">驾驶时长</div>
+            <div class="text-lg font-bold text-white mt-1">2.5 ~ 3.5 小时</div>
+          </div>
+          <div class="glass-card p-4 rounded-2xl border-l-4 border-white/30">
+            <div class="text-xs text-slate-400">分段停留</div>
+            <div class="text-lg font-bold text-white mt-1">1 ~ 2 天</div>
+          </div>
+          <div class="glass-card p-4 rounded-2xl border-l-4 border-white/22">
+            <div class="text-xs text-slate-400">充能练体</div>
+            <div class="text-lg font-bold text-white mt-1">超充 + 24H 健身房</div>
+          </div>
         </div>
       </div>
 
       <!-- 7 站详细图景与执行卡片 -->
       <div class="space-y-14">
         <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
-          <svg class="fa-i text-slate-300" aria-hidden="true"><use href="#fa-camera"></use></svg> 分站实景、补能与特色生活流
+          <svg class="fa-i text-slate-300" aria-hidden="true"><use href="#fa-route"></use></svg> 分站行程、补能与特色生活流
         </h2>
 
         <!-- Station 1: 衡阳站 -->
@@ -3288,28 +3191,6 @@
                 </div>
               </div>
             </div>
-            <details class="photo-fold">
-              <summary><span class="pf-left"><svg class="fa-i" aria-hidden="true"><use href="#fa-images"></use></svg>实景图集</span><span class="pf-meta mono">美食 / 景色 / 地方美景 · 3 张</span><svg class="fa-i pf-arrow" aria-hidden="true"><use href="#fa-chevron-down"></use></svg></summary>
-              <div class="pf-body">
-                <div class="deck" tabindex="0">
-                
-                <figure class="deck-card" data-subject="衡东黄贡椒炒黄牛肉 / 渣江假羊肉汤">
-                  <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="衡东黄贡椒炒黄牛肉 / 渣江假羊肉汤" loading="lazy">
-                  <figcaption class="deck-tag">美食</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="湘江风光带 · 石鼓书院">
-                  <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="湘江风光带 · 石鼓书院" loading="lazy">
-                  <figcaption class="deck-tag">景色</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="回雁峰 / 雁峰烟雨">
-                  <img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="回雁峰 / 雁峰烟雨" loading="lazy">
-                  <figcaption class="deck-tag">地方美景</figcaption>
-                </figure>
-              
-                </div>
-                              <div class="deck-hint" aria-hidden="true"></div>
-              </div>
-            </details>
           </div>
         </div>
 
@@ -3415,28 +3296,6 @@
               <p class="diet-tip"><svg class="dt-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span class="dt-tx">原则：绝不喝红油辣汤，饭前嚼 15g 坚果控血糖。</span></p>
               </div>
             </div>
-            <details class="photo-fold">
-              <summary><span class="pf-left"><svg class="fa-i" aria-hidden="true"><use href="#fa-images"></use></svg>实景图集</span><span class="pf-meta mono">美食 / 景色 / 地方美景 · 3 张</span><svg class="fa-i pf-arrow" aria-hidden="true"><use href="#fa-chevron-down"></use></svg></summary>
-              <div class="pf-body">
-                <div class="deck" tabindex="0">
-                
-                <figure class="deck-card" data-subject="栖凤渡鱼粉 / 清蒸东江翘嘴鱼">
-                  <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="栖凤渡鱼粉 / 清蒸东江翘嘴鱼" loading="lazy">
-                  <figcaption class="deck-tag">美食</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="东江湖 · 小东江晨雾">
-                  <img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="东江湖 · 小东江晨雾" loading="lazy">
-                  <figcaption class="deck-tag">景色</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="王仙岭绿道 / 苏仙岭">
-                  <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="王仙岭绿道 / 苏仙岭" loading="lazy">
-                  <figcaption class="deck-tag">地方美景</figcaption>
-                </figure>
-              
-                </div>
-                              <div class="deck-hint" aria-hidden="true"></div>
-              </div>
-            </details>
           </div>
         </div>
 
@@ -3543,28 +3402,6 @@
               <p class="diet-tip"><svg class="dt-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span class="dt-tx">原则：饮食天然低油，脾胃极其舒适。</span></p>
               </div>
             </div>
-            <details class="photo-fold">
-              <summary><span class="pf-left"><svg class="fa-i" aria-hidden="true"><use href="#fa-images"></use></svg>实景图集</span><span class="pf-meta mono">美食 / 景色 / 地方美景 · 3 张</span><svg class="fa-i pf-arrow" aria-hidden="true"><use href="#fa-chevron-down"></use></svg></summary>
-              <div class="pf-body">
-                <div class="deck" tabindex="0">
-                
-                <figure class="deck-card" data-subject="清远白切鸡 · 北江鲜河虾">
-                  <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="清远白切鸡 · 北江鲜河虾" loading="lazy">
-                  <figcaption class="deck-tag">美食</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="北江江滨 · 飞来峡江道">
-                  <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="北江江滨 · 飞来峡江道" loading="lazy">
-                  <figcaption class="deck-tag">景色</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="古龙峡 / 连江口老街">
-                  <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="古龙峡 / 连江口老街" loading="lazy">
-                  <figcaption class="deck-tag">地方美景</figcaption>
-                </figure>
-              
-                </div>
-                              <div class="deck-hint" aria-hidden="true"></div>
-              </div>
-            </details>
           </div>
         </div>
 
@@ -3669,28 +3506,6 @@
                 </div>
               </div>
             </div>
-            <details class="photo-fold">
-              <summary><span class="pf-left"><svg class="fa-i" aria-hidden="true"><use href="#fa-images"></use></svg>实景图集</span><span class="pf-meta mono">美食 / 景色 / 地方美景 · 3 张</span><svg class="fa-i pf-arrow" aria-hidden="true"><use href="#fa-chevron-down"></use></svg></summary>
-              <div class="pf-body">
-                <div class="deck" tabindex="0">
-                
-                <figure class="deck-card" data-subject="水步黄鳝饭 · 纯瘦牛肉煲仔饭">
-                  <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="水步黄鳝饭 · 纯瘦牛肉煲仔饭" loading="lazy">
-                  <figcaption class="deck-tag">美食</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="赤坎华侨古镇骑楼">
-                  <img src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="赤坎华侨古镇骑楼" loading="lazy">
-                  <figcaption class="deck-tag">景色</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="自力村碉楼群">
-                  <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="自力村碉楼群" loading="lazy">
-                  <figcaption class="deck-tag">地方美景</figcaption>
-                </figure>
-              
-                </div>
-                              <div class="deck-hint" aria-hidden="true"></div>
-              </div>
-            </details>
           </div>
         </div>
 
@@ -3802,28 +3617,6 @@
               <p class="diet-tip"><svg class="dt-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span class="dt-tx">原则：天然海鲜自带丰富矿物质，热量极低饱腹感强。</span></p>
               </div>
             </div>
-            <details class="photo-fold">
-              <summary><span class="pf-left"><svg class="fa-i" aria-hidden="true"><use href="#fa-images"></use></svg>实景图集</span><span class="pf-meta mono">美食 / 景色 / 地方美景 · 3 张</span><svg class="fa-i pf-arrow" aria-hidden="true"><use href="#fa-chevron-down"></use></svg></summary>
-              <div class="pf-body">
-                <div class="deck" tabindex="0">
-                
-                <figure class="deck-card" data-subject="清蒸石斑鱼 · 白灼小管鱿鱼">
-                  <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="清蒸石斑鱼 · 白灼小管鱿鱼" loading="lazy">
-                  <figcaption class="deck-tag">美食</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="十里银滩 · 大角湾">
-                  <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="十里银滩 · 大角湾" loading="lazy">
-                  <figcaption class="deck-tag">景色</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="海陵岛风光 / 宋城">
-                  <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="海陵岛风光 / 宋城" loading="lazy">
-                  <figcaption class="deck-tag">地方美景</figcaption>
-                </figure>
-              
-                </div>
-                              <div class="deck-hint" aria-hidden="true"></div>
-              </div>
-            </details>
           </div>
         </div>
 
@@ -3930,28 +3723,6 @@
               <p class="diet-tip"><svg class="dt-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span class="dt-tx">原则：高锌高肌酸，极致生发生肌。</span></p>
               </div>
             </div>
-            <details class="photo-fold">
-              <summary><span class="pf-left"><svg class="fa-i" aria-hidden="true"><use href="#fa-images"></use></svg>实景图集</span><span class="pf-meta mono">美食 / 景色 / 地方美景 · 3 张</span><svg class="fa-i pf-arrow" aria-hidden="true"><use href="#fa-chevron-down"></use></svg></summary>
-              <div class="pf-body">
-                <div class="deck" tabindex="0">
-                
-                <figure class="deck-card" data-subject="原汁清蒸生蚝 · 湛江白切鸡">
-                  <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="原汁清蒸生蚝 · 湛江白切鸡" loading="lazy">
-                  <figcaption class="deck-tag">美食</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="金沙湾观海长廊">
-                  <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="金沙湾观海长廊" loading="lazy">
-                  <figcaption class="deck-tag">景色</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="赤坎老街骑楼">
-                  <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="赤坎老街骑楼" loading="lazy">
-                  <figcaption class="deck-tag">地方美景</figcaption>
-                </figure>
-              
-                </div>
-                              <div class="deck-hint" aria-hidden="true"></div>
-              </div>
-            </details>
           </div>
         </div>
 
@@ -4056,28 +3827,6 @@
                 </div>
               </div>
             </div>
-            <details class="photo-fold">
-              <summary><span class="pf-left"><svg class="fa-i" aria-hidden="true"><use href="#fa-images"></use></svg>实景图集</span><span class="pf-meta mono">美食 / 景色 / 地方美景 · 3 张</span><svg class="fa-i pf-arrow" aria-hidden="true"><use href="#fa-chevron-down"></use></svg></summary>
-              <div class="pf-body">
-                <div class="deck" tabindex="0">
-                
-                <figure class="deck-card" data-subject="文昌椰子鸡 · 清炒地瓜叶">
-                  <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="文昌椰子鸡 · 清炒地瓜叶" loading="lazy">
-                  <figcaption class="deck-tag">美食</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="海口西海岸 · 云洞图书馆">
-                  <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="海口西海岸 · 云洞图书馆" loading="lazy">
-                  <figcaption class="deck-tag">景色</figcaption>
-                </figure>
-                <figure class="deck-card" data-subject="万绿园 / 骑楼老街">
-                  <img src="https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="万绿园 / 骑楼老街" loading="lazy">
-                  <figcaption class="deck-tag">地方美景</figcaption>
-                </figure>
-              
-                </div>
-                              <div class="deck-hint" aria-hidden="true"></div>
-              </div>
-            </details>
           </div>
         </div>
 
@@ -4607,16 +4356,6 @@
       clearTimeout(toastTimer);
       toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
     }
-
-    // 照片堆：悬停 / 滚动 / 聚焦时展开铺平，静止时恢复散落叠放
-    document.querySelectorAll('.deck').forEach(deck => {
-      const expand = () => deck.classList.add('expanded');
-      const settle = () => { if (deck.scrollLeft < 8) deck.classList.remove('expanded'); };
-      deck.addEventListener('mouseenter', expand);
-      deck.addEventListener('focusin', expand);
-      deck.addEventListener('scroll', expand, { passive: true });
-      deck.addEventListener('mouseleave', settle);
-    });
 
     // 时间轴轻打卡（localStorage 持久化）
     const TL_KEY = 'tl_checks_v1';
@@ -5357,8 +5096,6 @@
       restoreTimeline();
       renderProgress();
       initStationFolds();
-      initPhotoFolds();
-      initGalleryImageFallbacks();
       centerMap();
       fetchWeather();
       updateBeijingClock();
@@ -5410,34 +5147,6 @@
         });
         card.appendChild(button);
       });
-    }
-
-    function initPhotoFolds() {
-      document.querySelectorAll('.photo-fold > summary').forEach(summary => {
-        summary.addEventListener('click', event => {
-          event.preventDefault();
-          const gallery = summary.parentElement;
-          gallery.open = !gallery.open;
-        });
-      });
-    }
-
-    function initGalleryImageFallbacks() {
-      document.addEventListener('error', event => {
-        const image = event.target;
-        if (!(image instanceof HTMLImageElement)) return;
-        const card = image.closest('.deck-card');
-        if (!card || image.dataset.errorHandled) return;
-
-        image.dataset.errorHandled = 'true';
-        image.hidden = true;
-        const fallback = document.createElement('div');
-        fallback.className = 'deck-image-fallback';
-        fallback.setAttribute('role', 'img');
-        fallback.setAttribute('aria-label', `图片暂不可用：${image.alt}`);
-        fallback.innerHTML = '图片暂不可用<span>请检查本地图片资源</span>';
-        card.appendChild(fallback);
-      }, true);
     }
 
     const audio = document.getElementById('bgm');
