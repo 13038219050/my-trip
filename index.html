@@ -771,7 +771,10 @@
       border-radius:inherit; background:rgba(255,255,255,.9);
     }
     .music-volume-value{ min-width:2.5em; text-align:right; }
-    .hero-music-audio{ display:none; }
+    .hero-music-audio{
+      display:block !important; position:absolute; width:1px; height:1px; opacity:0;
+      pointer-events:none;
+    }
     @keyframes heroScrollCue{
       0%,100%{ transform:translate(-50%, 0); opacity:.14; }
       50%{ transform:translate(-50%, 12px); opacity:.34; }
@@ -2723,7 +2726,9 @@
           <path class="music-mute-cross" d="m16 9 5 6m0-6-5 6"></path>
         </svg>
       </button>
-      <audio class="hero-music-audio" id="heroMusic" preload="auto" playsinline webkit-playsinline src="./新建文件夹/Falling%20Stars.mp3"></audio>
+      <audio class="hero-music-audio" id="heroMusic" preload="metadata" controls tabindex="-1" aria-hidden="true" playsinline webkit-playsinline>
+        <source src="bgm.mp3" type="audio/mpeg">
+      </audio>
     </div>
   </section>
 
@@ -5449,13 +5454,20 @@
       let autoplayBlocked = false;
       let audioUnlocked = false;
 
+      function hasDecodeError() {
+        return audio.error
+          && (audio.error.code === 3 || audio.error.code === 4);
+      }
+
       function syncMuteButton() {
         const muted = audio.muted;
+        const unsupported = hasDecodeError();
         button.classList.toggle('is-muted', muted);
-        const action = audio.paused && autoplayBlocked
-          ? '点击播放背景音乐'
+        const action = audio.paused
+          ? (unsupported ? '音频无法解码，点击重试' : (autoplayBlocked ? '播放被阻止，点击重试' : '点击播放背景音乐'))
           : (muted ? '开启背景音乐声音' : '静音背景音乐');
         button.setAttribute('aria-label', action);
+        button.setAttribute('aria-pressed', String(muted));
         button.title = `${action} · 按住左滑增大、右滑减小音量 ${Math.round(audio.volume * 100)}%`;
         button.setAttribute('aria-valuenow', String(Math.round(audio.volume * 100)));
       }
@@ -5465,23 +5477,36 @@
         try { localStorage.setItem(progressKey, String(audio.currentTime)); } catch (e) {}
       }
 
-      function startPlayback() {
+      function playbackErrorMessage(error) {
+        if (hasDecodeError()
+          || (error && error.name === 'NotSupportedError')) {
+          return '浏览器无法解码这份 MP3，请确认已上传完整音频文件或转换为标准 MP3。';
+        }
+        if (error && error.name === 'NotAllowedError') {
+          return '浏览器阻止了自动播放，请点击音乐按钮开始播放。';
+        }
+        return '背景音乐暂时无法播放，请检查音频文件和网络连接后重试。';
+      }
+
+      function startPlayback(showError = false) {
+        if (!audio.paused) return;
+        audio.muted = false;
         try {
           const playPromise = audio.play();
           if (playPromise) {
             playPromise.then(() => {
               autoplayBlocked = false;
               syncMuteButton();
-            }).catch(() => {
+            }).catch(error => {
               autoplayBlocked = true;
-              audio.muted = false;
               syncMuteButton();
+              if (showError) showToast(playbackErrorMessage(error));
             });
           }
         } catch (e) {
           autoplayBlocked = true;
-          audio.muted = false;
           syncMuteButton();
+          if (showError) showToast(playbackErrorMessage(e));
         }
       }
 
@@ -5489,16 +5514,23 @@
         if (audioUnlocked || !event.isTrusted) return;
         audioUnlocked = true;
         document.removeEventListener('touchstart', unlockAudioFromGesture);
-        document.removeEventListener('click', unlockAudioFromGesture);
+        document.removeEventListener('click', unlockAudioFromGesture, true);
         if (audio.paused && !button.contains(event.target)) startPlayback();
       }
 
       document.addEventListener('touchstart', unlockAudioFromGesture, { passive: true });
-      document.addEventListener('click', unlockAudioFromGesture);
+      document.addEventListener('click', unlockAudioFromGesture, true);
       audio.volume = 0.72;
       audio.defaultMuted = false;
       audio.muted = false;
       syncMuteButton();
+      audio.addEventListener('error', () => {
+        autoplayBlocked = true;
+        syncMuteButton();
+      });
+      audio.addEventListener('play', syncMuteButton);
+      audio.addEventListener('pause', syncMuteButton);
+      audio.addEventListener('volumechange', syncMuteButton);
       audio.addEventListener('loadedmetadata', () => {
         try {
           const saved = Number(localStorage.getItem(progressKey));
@@ -5506,7 +5538,6 @@
             audio.currentTime = saved;
           }
         } catch (e) {}
-        startPlayback();
       }, { once: true });
 
       audio.addEventListener('timeupdate', () => {
@@ -5569,10 +5600,7 @@
           return;
         }
         if (audio.paused) {
-          audio.muted = false;
-          autoplayBlocked = false;
-          startPlayback();
-          syncMuteButton();
+          startPlayback(true);
           return;
         }
         audio.muted = !audio.muted;
