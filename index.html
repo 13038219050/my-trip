@@ -771,10 +771,11 @@
       border-radius:inherit; background:rgba(255,255,255,.9);
     }
     .music-volume-value{ min-width:2.5em; text-align:right; }
-    .hero-music-audio{
-      display:block !important; position:absolute; width:1px; height:1px; opacity:0;
-      pointer-events:none;
+    #bgm{
+      display:block !important; position:absolute; width:1px; height:1px;
+      opacity:0; pointer-events:none;
     }
+    .music-mute-button:not(.is-muted){ color:rgba(255,255,255,.88); }
     @keyframes heroScrollCue{
       0%,100%{ transform:translate(-50%, 0); opacity:.14; }
       50%{ transform:translate(-50%, 12px); opacity:.34; }
@@ -2719,16 +2720,14 @@
         <span class="music-volume-track"><span class="music-volume-fill" id="musicVolumeFill"></span></span>
         <span class="music-volume-value" id="musicVolumeValue">72%</span>
       </div>
-      <button class="music-mute-button" id="musicMuteButton" type="button" aria-label="静音背景音乐" title="静音背景音乐">
+      <button class="music-mute-button" id="music-btn" type="button" aria-label="播放背景音乐" title="播放背景音乐" aria-pressed="false">
         <svg class="fa-i" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M11 5 6 9H3v6h3l5 4z"></path>
           <path class="music-sound-wave" d="M15 9a4 4 0 0 1 0 6M17.5 6.5a8 8 0 0 1 0 11"></path>
           <path class="music-mute-cross" d="m16 9 5 6m0-6-5 6"></path>
         </svg>
       </button>
-      <audio class="hero-music-audio" id="heroMusic" preload="metadata" controls tabindex="-1" aria-hidden="true" playsinline webkit-playsinline>
-        <source src="bgm.mp3" type="audio/mpeg">
-      </audio>
+      <audio id="bgm" src="bgm.mp3" loop preload="auto" playsinline controls></audio>
     </div>
   </section>
 
@@ -5441,172 +5440,52 @@
       }, true);
     }
 
-    (function initHeroMusic() {
-      const audio = document.getElementById('heroMusic');
-      const button = document.getElementById('musicMuteButton');
-      const volumeIndicator = document.getElementById('musicVolumeIndicator');
-      const volumeFill = document.getElementById('musicVolumeFill');
-      const volumeValue = document.getElementById('musicVolumeValue');
-      if (!audio || !button || !volumeIndicator || !volumeFill || !volumeValue) return;
-
-      const progressKey = 'li_falling_stars_progress_v1';
-      let lastSavedSecond = -1;
-      let autoplayBlocked = false;
-      let audioUnlocked = false;
-
-      function hasDecodeError() {
-        return audio.error
-          && (audio.error.code === 3 || audio.error.code === 4);
-      }
-
-      function syncMuteButton() {
-        const muted = audio.muted;
-        const unsupported = hasDecodeError();
-        button.classList.toggle('is-muted', muted);
-        const action = audio.paused
-          ? (unsupported ? '音频无法解码，点击重试' : (autoplayBlocked ? '播放被阻止，点击重试' : '点击播放背景音乐'))
-          : (muted ? '开启背景音乐声音' : '静音背景音乐');
-        button.setAttribute('aria-label', action);
-        button.setAttribute('aria-pressed', String(muted));
-        button.title = `${action} · 按住左滑增大、右滑减小音量 ${Math.round(audio.volume * 100)}%`;
-        button.setAttribute('aria-valuenow', String(Math.round(audio.volume * 100)));
-      }
-
-      function saveProgress() {
-        if (!Number.isFinite(audio.currentTime)) return;
-        try { localStorage.setItem(progressKey, String(audio.currentTime)); } catch (e) {}
-      }
-
-      function playbackErrorMessage(error) {
-        if (hasDecodeError()
-          || (error && error.name === 'NotSupportedError')) {
-          return '浏览器无法解码这份 MP3，请确认已上传完整音频文件或转换为标准 MP3。';
-        }
-        if (error && error.name === 'NotAllowedError') {
-          return '浏览器阻止了自动播放，请点击音乐按钮开始播放。';
-        }
-        return '背景音乐暂时无法播放，请检查音频文件和网络连接后重试。';
-      }
-
-      function startPlayback(showError = false) {
-        if (!audio.paused) return;
-        audio.muted = false;
-        try {
-          const playPromise = audio.play();
-          if (playPromise) {
-            playPromise.then(() => {
-              autoplayBlocked = false;
-              syncMuteButton();
-            }).catch(error => {
-              autoplayBlocked = true;
-              syncMuteButton();
-              if (showError) showToast(playbackErrorMessage(error));
-            });
-          }
-        } catch (e) {
-          autoplayBlocked = true;
-          syncMuteButton();
-          if (showError) showToast(playbackErrorMessage(e));
-        }
-      }
-
-      function unlockAudioFromGesture(event) {
-        if (audioUnlocked || !event.isTrusted) return;
-        audioUnlocked = true;
-        document.removeEventListener('touchstart', unlockAudioFromGesture);
-        document.removeEventListener('click', unlockAudioFromGesture, true);
-        if (audio.paused && !button.contains(event.target)) startPlayback();
-      }
-
-      document.addEventListener('touchstart', unlockAudioFromGesture, { passive: true });
-      document.addEventListener('click', unlockAudioFromGesture, true);
-      audio.volume = 0.72;
-      audio.defaultMuted = false;
+    const audio = document.getElementById('bgm');
+    const musicBtn = document.getElementById('music-btn') || document.querySelector('.music-btn');
+    const syncMusicButton = () => {
+      if (!musicBtn) return;
+      const muted = audio.muted || audio.paused;
+      musicBtn.classList.toggle('is-muted', muted);
+      musicBtn.setAttribute('aria-pressed', String(!muted));
+      const label = audio.paused ? '播放背景音乐' : muted ? '恢复背景音乐' : '静音背景音乐';
+      musicBtn.setAttribute('aria-label', label);
+      musicBtn.title = label;
+    };
+    const stopUnlockListeners = () => {
+      window.removeEventListener('click', unlockMusic);
+      window.removeEventListener('touchstart', unlockMusic);
+    };
+    const playMusic = () => {
+      if (!audio.paused) return Promise.resolve();
       audio.muted = false;
-      syncMuteButton();
-      audio.addEventListener('error', () => {
-        autoplayBlocked = true;
-        syncMuteButton();
-      });
-      audio.addEventListener('play', syncMuteButton);
-      audio.addEventListener('pause', syncMuteButton);
-      audio.addEventListener('volumechange', syncMuteButton);
-      audio.addEventListener('loadedmetadata', () => {
-        try {
-          const saved = Number(localStorage.getItem(progressKey));
-          if (Number.isFinite(saved) && saved > 0 && saved < audio.duration - 1) {
-            audio.currentTime = saved;
-          }
-        } catch (e) {}
-      }, { once: true });
-
-      audio.addEventListener('timeupdate', () => {
-        const second = Math.floor(audio.currentTime);
-        if (second !== lastSavedSecond) {
-          lastSavedSecond = second;
-          saveProgress();
-        }
-      });
-      audio.addEventListener('ended', () => {
-        try { localStorage.setItem(progressKey, '0'); } catch (e) {}
-      });
-      window.addEventListener('pagehide', saveProgress);
-
-      let pointerStartX = null;
-      let volumeAtStart = audio.volume;
-      let volumeWasDragged = false;
-      let suppressNextClick = false;
-      function updateVolumeIndicator() {
-        const percent = Math.round(audio.volume * 100);
-        volumeFill.style.width = `${percent}%`;
-        volumeValue.textContent = `${percent}%`;
-        volumeIndicator.classList.add('is-visible');
-      }
-      function hideVolumeIndicator() {
-        volumeIndicator.classList.remove('is-visible');
-      }
-      button.addEventListener('pointerdown', event => {
-        if (event.button !== undefined && event.button !== 0) return;
-        pointerStartX = event.clientX;
-        volumeAtStart = audio.volume;
-        volumeWasDragged = false;
-        if (button.setPointerCapture) button.setPointerCapture(event.pointerId);
-      });
-      button.addEventListener('pointermove', event => {
-        if (pointerStartX === null) return;
-        const delta = event.clientX - pointerStartX;
-        if (Math.abs(delta) < 3) return;
-        volumeWasDragged = true;
-        audio.volume = Math.max(0, Math.min(1, volumeAtStart - delta / 64));
-        if (audio.volume === 0) audio.muted = true;
-        else if (audio.muted) audio.muted = false;
-        syncMuteButton();
-        updateVolumeIndicator();
-      });
-      button.addEventListener('pointerup', () => {
-        if (pointerStartX === null) return;
-        pointerStartX = null;
-        if (volumeWasDragged) suppressNextClick = true;
-        hideVolumeIndicator();
-      });
-      button.addEventListener('pointercancel', () => {
-        pointerStartX = null;
-        hideVolumeIndicator();
-      });
-
-      button.addEventListener('click', () => {
-        if (suppressNextClick) {
-          suppressNextClick = false;
-          return;
-        }
+      return audio.play().then(() => {
+        syncMusicButton();
+        stopUnlockListeners();
+      })
+        .catch(err => console.log('等待交互:', err));
+    };
+    const unlockMusic = event => {
+      if (musicBtn && musicBtn.contains(event.target)) return;
+      playMusic();
+    };
+    window.addEventListener('click', unlockMusic);
+    window.addEventListener('touchstart', unlockMusic, { passive: true });
+    audio.addEventListener('play', syncMusicButton);
+    audio.addEventListener('pause', syncMusicButton);
+    audio.addEventListener('volumechange', syncMusicButton);
+    syncMusicButton();
+    playMusic();
+    if (musicBtn) {
+      musicBtn.addEventListener('click', event => {
+        event.stopPropagation();
         if (audio.paused) {
-          startPlayback(true);
+          playMusic();
           return;
         }
         audio.muted = !audio.muted;
-        syncMuteButton();
+        syncMusicButton();
       });
-    })();
+    }
 
     /* ===== V10：竖排主标题「见己向南」滑动视差 & 阻尼互动 =====
        竖向交错（Staggered Y-shift）：见微动、南更沉 —— 垂挂天际随风微扬。 */
