@@ -848,9 +848,9 @@
     .station-fold-toggle{
       position:relative; z-index:5;
       display:flex; align-items:center; justify-content:center;
-      width:40px; height:30px; margin:0 14px 10px auto; padding:0;
+      width:44px; height:44px; margin:0 auto 10px; padding:10px;
       border:0; border-radius:0; background:transparent; color:rgba(255,255,255,.72);
-      cursor:pointer; transition:color .2s ease, transform .25s ease;
+      cursor:pointer; touch-action:manipulation; transition:color .2s ease, transform .25s ease;
     }
     .station-fold-toggle:hover{ color:#FFFFFF; }
     .station-fold-toggle .fa-i{ width:16px; height:16px; transition:transform .25s ease; }
@@ -1419,7 +1419,18 @@
     .deck.expanded .deck-card{ transform:none; }
     .deck-card:hover{ box-shadow:0 22px 48px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.22); z-index:5; }
     .deck-card img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .5s ease; }
+    .deck-card img[hidden]{ display:none; }
     .deck-card:hover img{ transform:scale(1.05); }
+    .deck-image-fallback{
+      position:absolute; inset:0; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:.45rem; padding:1rem;
+      background:linear-gradient(145deg, rgba(255,255,255,.1), rgba(255,255,255,.025));
+      color:#E2E8F0; text-align:center; font-size:.75rem;
+    }
+    .deck-image-fallback::before{
+      content:'▧'; color:rgba(255,255,255,.58); font-size:1.8rem; line-height:1;
+    }
+    .deck-image-fallback span{ color:#94A3B8; font-size:.65rem; }
     .deck-tag{
       position:absolute; left:8px; bottom:8px; padding:2px 8px;
       font-size:10px; font-weight:700; letter-spacing:.1em; border-radius:5px;
@@ -2581,6 +2592,13 @@
       max-height:calc(100dvh - 32px) !important;
       align-items:center !important; overflow-y:auto !important;
     }
+    .tab-panel{ padding-top:max(44px, env(safe-area-inset-top, 0px)); }
+    .station-card{ scroll-margin-top:max(44px, env(safe-area-inset-top, 0px)); }
+    #station-7{ margin-bottom:90px !important; }
+    .to-top-btn{
+      z-index:100 !important;
+      bottom:calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    }
   </style>
 </head>
   <body class="min-h-screen flex flex-col selection:bg-white/25 selection:text-white">
@@ -2655,7 +2673,7 @@
       </span>
       <span class="hero-brush" aria-hidden="true"></span>
     </h1>
-    <a class="hero-scroll-cue" href="#panel-itinerary" aria-label="向下滑动查看内容" title="向下查看内容" onclick="document.getElementById('panel-itinerary').scrollIntoView({behavior:'smooth'}); return false;">
+    <a class="hero-scroll-cue" href="#panel-itinerary" aria-label="向下滑动查看内容" title="向下查看内容" onclick="document.getElementById('panel-itinerary').scrollIntoView({behavior:'smooth', block:'start'}); return false;">
       <svg class="fa-i" viewBox="0 0 100 32" aria-hidden="true"><path d="M22 14 L50 27 L78 14"></path></svg>
     </a>
     <div class="hero-music-dock" aria-label="背景音乐播放器">
@@ -2673,7 +2691,7 @@
           <path class="music-mute-cross" d="m16 9 5 6m0-6-5 6"></path>
         </svg>
       </button>
-      <audio class="hero-music-audio" id="heroMusic" preload="auto" src="新建文件夹/Falling%20Stars.mp3"></audio>
+      <audio class="hero-music-audio" id="heroMusic" preload="auto" playsinline webkit-playsinline src="./新建文件夹/Falling%20Stars.mp3"></audio>
     </div>
   </section>
 
@@ -3240,15 +3258,15 @@
                 <div class="deck" tabindex="0">
                 
                 <figure class="deck-card" data-subject="衡东黄贡椒炒黄牛肉 / 渣江假羊肉汤">
-                  <img src="./photos/hengyang-food.jpg" alt="衡东黄贡椒炒黄牛肉 / 渣江假羊肉汤" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/hengyang-food.jpg" alt="衡东黄贡椒炒黄牛肉 / 渣江假羊肉汤" loading="lazy">
                   <figcaption class="deck-tag">美食</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="湘江风光带 · 石鼓书院">
-                  <img src="./photos/hengyang-scene.jpg" alt="湘江风光带 · 石鼓书院" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/hengyang-scene.jpg" alt="湘江风光带 · 石鼓书院" loading="lazy">
                   <figcaption class="deck-tag">景色</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="回雁峰 / 雁峰烟雨">
-                  <img src="./photos/hengyang-landmark.jpg" alt="回雁峰 / 雁峰烟雨" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/hengyang-landmark.jpg" alt="回雁峰 / 雁峰烟雨" loading="lazy">
                   <figcaption class="deck-tag">地方美景</figcaption>
                 </figure>
               
@@ -3367,15 +3385,15 @@
                 <div class="deck" tabindex="0">
                 
                 <figure class="deck-card" data-subject="栖凤渡鱼粉 / 清蒸东江翘嘴鱼">
-                  <img src="./photos/chenzhou-food.jpg" alt="栖凤渡鱼粉 / 清蒸东江翘嘴鱼" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/chenzhou-food.jpg" alt="栖凤渡鱼粉 / 清蒸东江翘嘴鱼" loading="lazy">
                   <figcaption class="deck-tag">美食</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="东江湖 · 小东江晨雾">
-                  <img src="./photos/chenzhou-scene.jpg" alt="东江湖 · 小东江晨雾" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/chenzhou-scene.jpg" alt="东江湖 · 小东江晨雾" loading="lazy">
                   <figcaption class="deck-tag">景色</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="王仙岭绿道 / 苏仙岭">
-                  <img src="./photos/chenzhou-landmark.jpg" alt="王仙岭绿道 / 苏仙岭" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/chenzhou-landmark.jpg" alt="王仙岭绿道 / 苏仙岭" loading="lazy">
                   <figcaption class="deck-tag">地方美景</figcaption>
                 </figure>
               
@@ -3495,15 +3513,15 @@
                 <div class="deck" tabindex="0">
                 
                 <figure class="deck-card" data-subject="清远白切鸡 · 北江鲜河虾">
-                  <img src="./photos/qingyuan-food.jpg" alt="清远白切鸡 · 北江鲜河虾" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/qingyuan-food.jpg" alt="清远白切鸡 · 北江鲜河虾" loading="lazy">
                   <figcaption class="deck-tag">美食</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="北江江滨 · 飞来峡江道">
-                  <img src="./photos/qingyuan-scene.jpg" alt="北江江滨 · 飞来峡江道" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/qingyuan-scene.jpg" alt="北江江滨 · 飞来峡江道" loading="lazy">
                   <figcaption class="deck-tag">景色</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="古龙峡 / 连江口老街">
-                  <img src="./photos/qingyuan-landmark.jpg" alt="古龙峡 / 连江口老街" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/qingyuan-landmark.jpg" alt="古龙峡 / 连江口老街" loading="lazy">
                   <figcaption class="deck-tag">地方美景</figcaption>
                 </figure>
               
@@ -3621,15 +3639,15 @@
                 <div class="deck" tabindex="0">
                 
                 <figure class="deck-card" data-subject="水步黄鳝饭 · 纯瘦牛肉煲仔饭">
-                  <img src="./photos/kaiping-food.jpg" alt="水步黄鳝饭 · 纯瘦牛肉煲仔饭" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/kaiping-food.jpg" alt="水步黄鳝饭 · 纯瘦牛肉煲仔饭" loading="lazy">
                   <figcaption class="deck-tag">美食</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="赤坎华侨古镇骑楼">
-                  <img src="./photos/kaiping-scene.jpg" alt="赤坎华侨古镇骑楼" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/kaiping-scene.jpg" alt="赤坎华侨古镇骑楼" loading="lazy">
                   <figcaption class="deck-tag">景色</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="自力村碉楼群">
-                  <img src="./photos/kaiping-landmark.jpg" alt="自力村碉楼群" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/kaiping-landmark.jpg" alt="自力村碉楼群" loading="lazy">
                   <figcaption class="deck-tag">地方美景</figcaption>
                 </figure>
               
@@ -3754,15 +3772,15 @@
                 <div class="deck" tabindex="0">
                 
                 <figure class="deck-card" data-subject="清蒸石斑鱼 · 白灼小管鱿鱼">
-                  <img src="./photos/yangjiang-food.jpg" alt="清蒸石斑鱼 · 白灼小管鱿鱼" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/yangjiang-food.jpg" alt="清蒸石斑鱼 · 白灼小管鱿鱼" loading="lazy">
                   <figcaption class="deck-tag">美食</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="十里银滩 · 大角湾">
-                  <img src="./photos/yangjiang-scene.jpg" alt="十里银滩 · 大角湾" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/yangjiang-scene.jpg" alt="十里银滩 · 大角湾" loading="lazy">
                   <figcaption class="deck-tag">景色</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="海陵岛风光 / 宋城">
-                  <img src="./photos/yangjiang-landmark.jpg" alt="海陵岛风光 / 宋城" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/yangjiang-landmark.jpg" alt="海陵岛风光 / 宋城" loading="lazy">
                   <figcaption class="deck-tag">地方美景</figcaption>
                 </figure>
               
@@ -3882,15 +3900,15 @@
                 <div class="deck" tabindex="0">
                 
                 <figure class="deck-card" data-subject="原汁清蒸生蚝 · 湛江白切鸡">
-                  <img src="./photos/zhanjiang-food.jpg" alt="原汁清蒸生蚝 · 湛江白切鸡" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/zhanjiang-food.jpg" alt="原汁清蒸生蚝 · 湛江白切鸡" loading="lazy">
                   <figcaption class="deck-tag">美食</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="金沙湾观海长廊">
-                  <img src="./photos/zhanjiang-scene.jpg" alt="金沙湾观海长廊" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/zhanjiang-scene.jpg" alt="金沙湾观海长廊" loading="lazy">
                   <figcaption class="deck-tag">景色</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="赤坎老街骑楼">
-                  <img src="./photos/zhanjiang-landmark.jpg" alt="赤坎老街骑楼" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/zhanjiang-landmark.jpg" alt="赤坎老街骑楼" loading="lazy">
                   <figcaption class="deck-tag">地方美景</figcaption>
                 </figure>
               
@@ -4008,15 +4026,15 @@
                 <div class="deck" tabindex="0">
                 
                 <figure class="deck-card" data-subject="文昌椰子鸡 · 清炒地瓜叶">
-                  <img src="./photos/haikou-food.jpg" alt="文昌椰子鸡 · 清炒地瓜叶" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/haikou-food.jpg" alt="文昌椰子鸡 · 清炒地瓜叶" loading="lazy">
                   <figcaption class="deck-tag">美食</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="海口西海岸 · 云洞图书馆">
-                  <img src="./photos/haikou-scene.jpg" alt="海口西海岸 · 云洞图书馆" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/haikou-scene.jpg" alt="海口西海岸 · 云洞图书馆" loading="lazy">
                   <figcaption class="deck-tag">景色</figcaption>
                 </figure>
                 <figure class="deck-card" data-subject="万绿园 / 骑楼老街">
-                  <img src="./photos/haikou-landmark.jpg" alt="万绿园 / 骑楼老街" loading="lazy" onerror="this.closest('.deck-card').style.display='none'">
+                  <img src="./新建文件夹/photos/haikou-landmark.jpg" alt="万绿园 / 骑楼老街" loading="lazy">
                   <figcaption class="deck-tag">地方美景</figcaption>
                 </figure>
               
@@ -4496,7 +4514,10 @@
       });
       const targetPanel = document.getElementById(`panel-${tabId}`);
       const targetBtn = document.getElementById(`tab-${tabId}`);
-      if (targetPanel) targetPanel.classList.remove('hidden');
+      if (targetPanel) {
+        targetPanel.classList.remove('hidden');
+        targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
       if (targetBtn) {
         targetBtn.classList.add('active');
         targetBtn.classList.remove('text-slate-400');
@@ -4508,7 +4529,7 @@
     function scrollToStation(stationId) {
       const el = document.getElementById(stationId);
       if (!el) return;
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       el.classList.remove('hl');
       void el.offsetWidth; // 重启动画
       el.classList.add('hl');
@@ -5071,6 +5092,10 @@
       const closeDrawer = () => {
         opened = false;
         rail.classList.add('sr-folded');
+        if (rail.contains(document.activeElement)) {
+          if (edge) edge.focus({ preventScroll: true });
+          else document.activeElement.blur();
+        }
         rail.setAttribute('aria-hidden', 'true');
         if (edge) edge.classList.remove('nei-hide');
       };
@@ -5297,6 +5322,7 @@
       renderProgress();
       initStationFolds();
       initPhotoFolds();
+      initGalleryImageFallbacks();
       centerMap();
       fetchWeather();
       updateBeijingClock();
@@ -5360,6 +5386,24 @@
       });
     }
 
+    function initGalleryImageFallbacks() {
+      document.addEventListener('error', event => {
+        const image = event.target;
+        if (!(image instanceof HTMLImageElement)) return;
+        const card = image.closest('.deck-card');
+        if (!card || image.dataset.errorHandled) return;
+
+        image.dataset.errorHandled = 'true';
+        image.hidden = true;
+        const fallback = document.createElement('div');
+        fallback.className = 'deck-image-fallback';
+        fallback.setAttribute('role', 'img');
+        fallback.setAttribute('aria-label', `图片暂不可用：${image.alt}`);
+        fallback.innerHTML = '图片暂不可用<span>请检查本地图片资源</span>';
+        card.appendChild(fallback);
+      }, true);
+    }
+
     (function initHeroMusic() {
       const audio = document.getElementById('heroMusic');
       const button = document.getElementById('musicMuteButton');
@@ -5371,6 +5415,7 @@
       const progressKey = 'li_falling_stars_progress_v1';
       let lastSavedSecond = -1;
       let autoplayBlocked = false;
+      let audioUnlocked = false;
 
       function syncMuteButton() {
         const muted = audio.muted;
@@ -5408,6 +5453,16 @@
         }
       }
 
+      function unlockAudioFromGesture(event) {
+        if (audioUnlocked || !event.isTrusted) return;
+        audioUnlocked = true;
+        document.removeEventListener('touchstart', unlockAudioFromGesture);
+        document.removeEventListener('click', unlockAudioFromGesture);
+        if (audio.paused && !button.contains(event.target)) startPlayback();
+      }
+
+      document.addEventListener('touchstart', unlockAudioFromGesture, { passive: true });
+      document.addEventListener('click', unlockAudioFromGesture);
       audio.volume = 0.72;
       audio.defaultMuted = false;
       audio.muted = false;
