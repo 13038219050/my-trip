@@ -4301,7 +4301,17 @@
       const targetBtn = document.getElementById(`tab-${tabId}`);
       if (targetPanel) {
         targetPanel.classList.remove('hidden');
-        targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => {
+          if (tabId === 'itinerary') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+          }
+          // 优先对齐首张核心卡片；保留面板已有的顶部安全间距。
+          const firstCard = targetPanel.querySelector('.glass-card') || targetPanel;
+          const topGap = Math.max(16, parseFloat(getComputedStyle(targetPanel).paddingTop) || 0);
+          const targetScrollY = window.scrollY + firstCard.getBoundingClientRect().top - topGap;
+          window.scrollTo({ top: Math.max(0, targetScrollY), behavior: 'smooth' });
+        }, 50);
       }
       if (targetBtn) {
         targetBtn.classList.add('active');
